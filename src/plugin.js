@@ -1,20 +1,9 @@
 'use strict';
 
-import Chart from 'chart.js';
+import helpers from 'chart.js/helpers'
 
-var helpers = Chart.helpers;
 var STUB_KEY = '$chartjs_deferred';
 var MODEL_KEY = '$deferred';
-
-/**
- * Plugin based on discussion from Chart.js issue #2745.
- * @see https://github.com/chartjs/Chart.js/issues/2745
- */
-Chart.defaults.global.plugins.deferred = {
-  xOffset: 0,
-  yOffset: 0,
-  delay: 0
-};
 
 function defer(fn, delay) {
   if (delay) {
@@ -36,7 +25,7 @@ function computeOffset(value, base) {
 
 function chartInViewport(chart) {
   var options = chart[MODEL_KEY].options;
-  var canvas = chart.chart.canvas;
+  var canvas = chart.canvas;
 
   // http://stackoverflow.com/a/21696585
   if (!canvas || canvas.offsetParent === null) {
@@ -92,7 +81,7 @@ function isScrollable(node) {
 }
 
 function watch(chart) {
-  var canvas = chart.chart.canvas;
+  var canvas = chart.canvas;
   var parent = canvas.parentElement;
   var stub, charts;
 
@@ -101,7 +90,7 @@ function watch(chart) {
       stub = parent[STUB_KEY] || (parent[STUB_KEY] = {});
       charts = stub.charts || (stub.charts = []);
       if (charts.length === 0) {
-        helpers.addEvent(parent, 'scroll', onScroll);
+        parent.addEventListener('scroll', onScroll)
       }
 
       charts.push(chart);
@@ -117,7 +106,8 @@ function unwatch(chart) {
     var charts = element[STUB_KEY].charts;
     charts.splice(charts.indexOf(chart), 1);
     if (!charts.length) {
-      helpers.removeEvent(element, 'scroll', onScroll);
+
+      element.removeEventListener('scroll', onScroll)
       delete element[STUB_KEY];
     }
   });
@@ -125,9 +115,13 @@ function unwatch(chart) {
   chart[MODEL_KEY].elements = [];
 }
 
-Chart.plugins.register({
+export default {
   id: 'deferred',
-
+  defaults: {
+    xOffset: 0,
+    yOffset: 0,
+    delay: 0
+  },
   beforeInit: function(chart, options) {
     chart[MODEL_KEY] = {
       options: options,
@@ -179,4 +173,4 @@ Chart.plugins.register({
   destroy: function(chart) {
     unwatch(chart);
   }
-});
+};

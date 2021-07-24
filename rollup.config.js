@@ -13,13 +13,15 @@ module.exports = [
     input: 'src/plugin.js',
     output: ['.js', '.min.js'].map((suffix) => {
       const config = {
+        name: 'ChartDeffered',
         file: `dist/${pkg.name}${suffix}`,
         banner: banner,
         format: 'umd',
         indent: false,
         plugins: [],
         globals: {
-          'chart.js': 'Chart'
+          'chart.js': 'Chart',
+          'chart.js/helpers': 'helpers'
         }
       };
 
@@ -36,7 +38,8 @@ module.exports = [
       return config;
     }),
     external: [
-      'chart.js'
+      'chart.js',
+      'chart.js/helpers'
     ]
   }
 ];
