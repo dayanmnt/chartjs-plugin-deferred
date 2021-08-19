@@ -1,6 +1,6 @@
 'use strict';
 
-import helpers from 'chart.js/helpers'
+import * as helpers from 'chart.js/helpers';
 
 var STUB_KEY = '$chartjs_deferred';
 var MODEL_KEY = '$deferred';
@@ -68,7 +68,7 @@ function onScroll(event) {
   });
 }
 
-function isScrollable(node) {
+const isScrollable = (node) => {
   var type = node.nodeType;
   if (type === Node.ELEMENT_NODE) {
     var overflowX = helpers.getStyle(node, 'overflow-x');
@@ -78,7 +78,7 @@ function isScrollable(node) {
   }
 
   return node.nodeType === Node.DOCUMENT_NODE;
-}
+};
 
 function watch(chart) {
   var canvas = chart.canvas;
@@ -90,7 +90,7 @@ function watch(chart) {
       stub = parent[STUB_KEY] || (parent[STUB_KEY] = {});
       charts = stub.charts || (stub.charts = []);
       if (charts.length === 0) {
-        parent.addEventListener('scroll', onScroll)
+        parent.addEventListener('scroll', onScroll);
       }
 
       charts.push(chart);
@@ -107,7 +107,7 @@ function unwatch(chart) {
     charts.splice(charts.indexOf(chart), 1);
     if (!charts.length) {
 
-      element.removeEventListener('scroll', onScroll)
+      element.removeEventListener('scroll', onScroll);
       delete element[STUB_KEY];
     }
   });
@@ -122,7 +122,7 @@ export default {
     yOffset: 0,
     delay: 0
   },
-  beforeInit: function(chart, options) {
+  beforeInit: (chart, args, options) => {
     chart[MODEL_KEY] = {
       options: options,
       appeared: false,
@@ -134,7 +134,7 @@ export default {
     watch(chart);
   },
 
-  beforeDatasetsUpdate: function(chart, options) {
+  beforeDatasetsUpdate: (chart, args, options) => {
     var model = chart[MODEL_KEY];
     if (!model.loaded) {
       if (!model.appeared && !chartInViewport(chart)) {
